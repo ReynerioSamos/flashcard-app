@@ -83,9 +83,9 @@ export const validateUpdateCategory = (req, res, next) => {
 };
 
 export const validateCategoryID = (req, res, next) => {
-    const taskID = req.params.id;
+    const catID = req.params.id;
 
-    if (isNaN(parseInt(taskID))) {
+    if (isNaN(parseInt(catID))) {
         return res.status(400).json({
             success: false,
             errors: ['Category ID must be an integer']

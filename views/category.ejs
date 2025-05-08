@@ -1,0 +1,50 @@
+<%- include('partials/header') %>
+    <section class="flashcards-section">
+        <div class="category-header">
+            <h2><%= category.title %></h2>
+            <p><%= category.desc %></p>
+            <div class="action-buttons">
+                <a href="/<%= currentCategoryId %>/new" class="btn">Add Flashcard</a>
+                <a href="/<%= currentCategoryId %>/sort?criteria=progress" class="btn">Sort by Progress</a>
+            </div>
+        </div>
+
+        <form action="/<%= currentCategoryId %>" method="POST" class="flashcard-form">
+            <input type="text" name="type" placeholder="Card type (optional)">
+            <select name="progress">
+                <option value="Not Learned">Not Learned</option>
+                <option value="Partially Learned">Partially Learned</option>
+                <option value="Learned">Learned</option>
+            </select>
+            <textarea name="front" placeholder="Front text" required></textarea>
+            <textarea name="back" placeholder="Back text (optional)"></textarea>
+            <button type="submit">Create Flashcard</button>
+        </form>
+
+        <div class="flashcard-actions">
+            <form action="/<%= currentCategoryId %>/filter" method="GET" class="filter-form">
+                <select name="progress">
+                    <option value="">All Progress</option>
+                    <option value="not learned">Not Learned</option>
+                    <option value="partially learned">Partially Learned</option>
+                    <option value="learned">Learned</option>
+                </select>
+                <button type="submit">Filter</button>
+            </form>
+        </div>
+
+        <div class="flashcard-list">
+            <% flashcards.forEach(flashcard => { %>
+                <div class="flashcard-preview" data-progress="<%= flashcard.progress.toLowerCase() %>">
+                    <a href="/<%= currentCategoryId %>/<%= flashcard.fcid %>">
+                        <div class="flashcard-front">
+                            <span class="flashcard-type"><%= flashcard.type %></span>
+                            <p><%= flashcard.front %></p>
+                            <span class="progress-badge"><%= flashcard.progress %></span>
+                        </div>
+                    </a>
+                </div>
+            <% }); %>
+        </div>
+    </section>
+<%- include('partials/footer') %>

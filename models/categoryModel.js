@@ -12,7 +12,7 @@ export class Category {
         this.updated_at = updated_at;
     }
 
-    async addFlashcard(type, progress, front, back) {
+    static async addFlashcard(catID, type, progress, front, back) {
         const validProgress = ['Learned', 'Partially Learned', 'Not Learned'];
         const cardProgress = validProgress.includes(progress) ? progress : 'Not Learned';
 
@@ -35,7 +35,7 @@ export class Category {
         );
     }
 
-    async getFlashcard(flashid) {
+    static async getFlashcard(flashid) {
         const result = await query(
             `SELECT * FROM flashcards WHERE fcid = $1`,
             [flashid]
@@ -56,15 +56,18 @@ export class Category {
         );
     }
 
-    async deleteFlashcard(flashid) {
+    static async deleteFlashcard(flashid) {
         await query(
-            `DELETE FROM flashcards WHERE fcid = $1`
+            `DELETE FROM flashcards WHERE fcid = $1`,
             [flashid]
         );
     }
 
-    async displayAllFlashcards() {
-        const result = await query(`SELECT * FROM flashcards`);
+    static async displayAllFlashcards(categoryID) {
+        const result = await query(
+            `SELECT * FROM flashcards WHERE catID = $1`,
+            [categoryID]
+        );
         return result.rows.map(row => new Flashcard (
             row.fcid,
             row.catid,
@@ -77,7 +80,7 @@ export class Category {
         ));
     }
 
-    async setProgress(flashid,newProgress) {
+    static async setProgress(flashid,newProgress) {
         const result = await query(
             `UPDATE flashcards
             SET progress = $2,
@@ -102,7 +105,7 @@ export class Category {
         );
     }
 
-    async searchFlashcards(searchString) {
+    static async searchFlashcards(searchString) {
         const lowercaseSearchString = `%${searchString.toLowerCase().trim()}%`;
 
         const result = await query(
@@ -125,14 +128,14 @@ export class Category {
         ));
     }
 
-    async filterFlashcards(filterprogress) {
+    static async filterFlashcards(filterprogress) {
         let queryText = 'SELECT * FROM flashcards';
         let params = [];
 
         if (filterprogress === 'not learned') {
             queryText += 'WHERE progress = not learned'
         } else if (filterprogress === 'partially learned') {
-            queryText += 'WHERE progress = partiall learned'
+            queryText += 'WHERE progress = partially learned'
         } else if (filterprogress === 'learned') {
             queryText += 'WHERE progress = learned'
         }
@@ -150,8 +153,8 @@ export class Category {
         ));
     }
 
-    async sortFlashcards(criteria = 'progress', order = 'desc') {
-        let queryText = 'SELECT * FROM tasks';
+    static async sortFlashcards(criteria = 'progress', order = 'desc') {
+        let queryText = 'SELECT * FROM flashcards';
 
         if (criteria == 'progress') {
             queryText +=
@@ -190,7 +193,7 @@ export class Category {
         this.desc = newDesc;
     }
 
-    async addCatergory(title, desc) {
+    static async addCatergory(title, desc) {
         const result = await query(
             `INSERT INTO category (title, desc)
              VALUES ($1, $2)
@@ -208,7 +211,7 @@ export class Category {
         );
     }
 
-    async getCategory(catid) {
+   static async getCategory(catid) {
         const result = await query(
             `SELECT * FROM category WHERE cid = $1`,
             [catid]
@@ -229,14 +232,14 @@ export class Category {
         );
     }
 
-    async deleteCategory(catid) {
+    static async deleteCategory(catid) {
         await query (
-            `DELETE FROM category WHERE id = $1`,
+            `DELETE FROM category WHERE cid = $1`,
             [catid]
         );
     }
 
-    async displayAllCategories() {
+    static async displayAllCategories() {
         const result = await query ('SELECT * FROM category');
         return result.rows.map(row => new Category (
             row.cid,

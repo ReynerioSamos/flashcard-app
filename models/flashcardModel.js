@@ -27,14 +27,14 @@ export class Flashcard {
     }
 
     displayFlashcard() {
-        console.log(`Flashcard id : ${fcid}`);
-        console.log(`Flashcard Category id : ${catid}`);
-        console.log(`Flashcard type : ${type}`);
-        console.log(`Flashcard progress : ${progress}`);
-        console.log(`Flashcard front: ${front}`);
-        console.log(`Flashcard back: ${back}`);
-        console.log(`Flashcard created_at: ${created_at}`);
-        console.log(`Flashcard updated_at: ${updated_at}`);
+        console.log(`Flashcard id : ${this.fcid}`);
+        console.log(`Flashcard Category id : ${this.catid}`);
+        console.log(`Flashcard type : ${this.type}`);
+        console.log(`Flashcard progress : ${this.progress}`);
+        console.log(`Flashcard front: ${this.front}`);
+        console.log(`Flashcard back: ${this.back}`);
+        console.log(`Flashcard created_at: ${this.created_at}`);
+        console.log(`Flashcard updated_at: ${this.updated_at}`);
     }
 
     updateFlashcard(newType, newProgress, newFront, newBack) {

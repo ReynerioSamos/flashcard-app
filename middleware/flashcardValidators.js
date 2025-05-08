@@ -85,10 +85,11 @@ export const validateUpdateFlashcard = (req, res, next) => {
 
         // Front Validation
     // Mandatory and must be b/w 3-500 characters
-    if (title !== undefined) {
+    if (front !== undefined) {
+        if (front.trim().length === 0) {
         const errormsg = 'Front must not be empty';
         errors.push(errormsg);
-        console.log(errormsg);
+        console.log(errormsg);}
     } else if (front.length < 3) {
         const errormsg = 'Front must be more than 3 characters';
         errors.push(errormsg);
@@ -138,11 +139,11 @@ export const validateFlashcardQueryParams = (req, res, next) => {
     if (q !== undefined && typeof q !== 'string') {
         const errormsg = 'Search query must be a string';
         errors.push(errormsg);
-        console.long(errormsg);
+        console.log(errormsg);
     }
 
     // Validate progress is provided
-    if (progress && !['not learned', 'partially learned', 'learned'].invludes(progress)) {
+    if (progress && !['not learned', 'partially learned', 'learned'].includes(progress)) {
         const errormsg = 'Progress must be not learned, partiall learned or learned.';
         errors.push(errormsg);
         console.log(errormsg);
@@ -176,4 +177,4 @@ export default {
     validateUpdateFlashcard,
     validateFlashcardID,
     validateFlashcardQueryParams
-};
+}

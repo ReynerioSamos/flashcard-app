@@ -1,0 +1,62 @@
+<%- include('partials/header') %>
+    <section class="flashcard-view">
+        <div class="flashcard-nav">
+            <a href="/<%= currentCategoryId %>" class="btn">Back to Category</a>
+        </div>
+
+        <div class="flashcard-container" id="flashcard">
+            <div class="flashcard <%= flashcard.progress.toLowerCase().replace(' ', '-') %>">
+                <div class="flashcard-header">
+                    <span class="flashcard-type"><%= flashcard.type %></span>
+                    <span class="progress-badge"><%= flashcard.progress %></span>
+                </div>
+                
+                <div class="flashcard-content front">
+                    <p><%= flashcard.front %></p>
+                    <button class="flip-btn" onclick="flipCard()">Show Back</button>
+                </div>
+                
+                <div class="flashcard-content back" style="display: none;">
+                    <p><%= flashcard.back %></p>
+                    <button class="flip-btn" onclick="flipCard()">Show Front</button>
+                </div>
+            </div>
+
+            <div class="flashcard-controls">
+                <form action="/<%= currentCategoryId %>/<%= flashcard.fcid %>/progress" method="POST" class="progress-form">
+                    <select name="progress">
+                        <option value="Not Learned" <%= flashcard.progress === 'Not Learned' ? 'selected' : '' %>>Not Learned</option>
+                        <option value="Partially Learned" <%= flashcard.progress === 'Partially Learned' ? 'selected' : '' %>>Partially Learned</option>
+                        <option value="Learned" <%= flashcard.progress === 'Learned' ? 'selected' : '' %>>Learned</option>
+                    </select>
+                    <button type="submit">Update Progress</button>
+                </form>
+
+                <form action="/<%= currentCategoryId %>/<%= flashcard.fcid %>?_method=DELETE" method="POST">
+                    <button type="submit" class="delete-btn">Delete Flashcard</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#" class="btn">Previous</a>
+            <a href="#" class="btn">Next</a>
+        </div>
+    </section>
+
+    <script>
+        function flipCard() {
+            const card = document.getElementById('flashcard');
+            const front = card.querySelector('.front');
+            const back = card.querySelector('.back');
+            
+            if (front.style.display === 'none') {
+                front.style.display = 'block';
+                back.style.display = 'none';
+            } else {
+                front.style.display = 'none';
+                back.style.display = 'block';
+            }
+        }
+    </script>
+<%- include('partials/footer') %>

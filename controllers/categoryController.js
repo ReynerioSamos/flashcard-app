@@ -1,11 +1,9 @@
-// Filename: controllers/categoryController.js
 import Category from "../models/categoryModel.js";
-import { Category } from "../models/categoryModel.js";
 
 export const getHome = async (req, res) => {
     try {
         const categorylist = await Category.displayAllCategories();
-        res.render('categories', {categorylist});
+        res.render('categories', { categorylist });
     } catch (err) {
         console.error('Error fetching categories', err);
         res.status(500).render('500');
@@ -14,38 +12,45 @@ export const getHome = async (req, res) => {
 
 export const addCategory = async (req, res) => {
     try {
-        const { title, desc} = req.body;
+        const { title, desc } = req.body;
         await Category.addCategory(title, desc);
         res.redirect('/');
     } catch (err) {
-        console.error('Error adding category ', err);
+        console.error('Error adding category', err);
         res.status(500).render('500');
     }
 };
 
 export const deleteCategory = async (req, res) => {
     try {
-        const catID = parseInt(req.params.id);
-        await Category.deleteCategory(catID);
+        const categoryID = parseInt(req.params.categoryID);
+        await Category.deleteCategory(categoryID);
         res.redirect('/');
     } catch (err) {
-        console.error(`Error deleting category with catID : ${catID}`, err);
+        console.error(`Error deleting category`, err);
         res.status(500).render('500');
     }
 };
 
-export const getCategoryID = async (req, res) => {
+export const getCategory = async (req, res) => {
     try {
-        const catID = parseInt(req, params.id);
-        const category = await Category.getCategoryID(catID);
+        const categoryId = parseInt(req.params.categoryId);
+        const category = await Category.getCategory(categoryId);
         
         if (!category) {
-            return res.status(404).send('Category not found');
+            return res.status(404).render('404', { message: 'Category not found' });
         }
 
-        res.render('category', { category });
+        // Get all flashcards for this category
+        const flashcards = await Category.displayAllFlashcards(categoryId);
+        
+        res.render('category', { 
+            category,
+            flashcards,
+            currentCategoryId: categoryId
+        });
     } catch (err) {
-        console.error('Error fetching category: ', err);
+        console.error('Error fetching category:', err);
         res.status(500).render('500');
     }
 };
