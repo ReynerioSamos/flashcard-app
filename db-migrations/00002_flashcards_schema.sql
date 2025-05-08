@@ -1,32 +1,110 @@
 -- Filename: 00001_initial_schema.sql
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE category (
-    id SERIAL PRIMARY KEY,
-    title VARCHAR(100) NOT NULL,
-    desc TEXT,
-    card_count INTEGER DEFAULT 0,
+CREATE TABLE flashcards (
+    fcid SERIAL PRIMARY KEY,
+    catid INTEGER NOT NULL REFERENCES categories(cid) ON DELETE CASCADE,
+    type VARCHAR(50),
+    progress VARCHAR(20) NOT NULL CHECK (progress IN ('Not Learned', 'Partially Learned', 'Learned')),
+    front TEXT NOT NULL,
+    back TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE OR REPLACE FUNCTION update_category_timestamp()
-RETURNS AS $$
+CREATE OR REPLACE FUNCTION update_flashcard_timestamp()
+RETURNS TRIGGER AS $$
 BEGIN
     NEW.updated_at = CURRENT_TIMESTAMP;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trigger_update_category_timestamp
-BEFORE UPDATE ON category
+CREATE TRIGGER trigger_update_flashcard_timestamp
+BEFORE UPDATE ON flashcards
 FOR EACH ROW
-EXECUTE FUNCTION update_category_timestamp();
+EXECUTE FUNCTION update_flashcard_timestamp();
+
+-- Function to update card_count in categories
+CREATE OR REPLACE FUNCTION update_card_count()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = 'INSERT' THEN
+        UPDATE categories 
+        SET card_count = card_count + 1 
+        WHERE cid = NEW.catid;
+    ELSIF TG_OP = 'DELETE' THEN
+        UPDATE categories 
+        SET card_count = card_count - 1 
+        WHERE cid = OLD.catid;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Triggers for card count
+CREATE TRIGGER trigger_increment_card_count
+AFTER INSERT ON flashcards
+FOR EACH ROW
+EXECUTE FUNCTION update_card_count();
+
+CREATE TRIGGER trigger_decrement_card_count
+AFTER DELETE ON flashcards
+FOR EACH ROW
+EXECUTE FUNCTION update_card_count();
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TRIGGER IF EXISTS trigger_update_category_timestamp ON category;
-DROP TABLE IF EXISTS category;
-DROP FUNCTION IF EXISTS update_category_timestamp;
+CREATE TABLE flashcards (
+    fcid SERIAL PRIMARY KEY,
+    catid INTEGER NOT NULL REFERENCES categories(cid) ON DELETE CASCADE,
+    type VARCHAR(50),
+    progress VARCHAR(20) NOT NULL CHECK (progress IN ('Not Learned', 'Partially Learned', 'Learned')),
+    front TEXT NOT NULL,
+    back TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE OR REPLACE FUNCTION update_flashcard_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_update_flashcard_timestamp
+BEFORE UPDATE ON flashcards
+FOR EACH ROW
+EXECUTE FUNCTION update_flashcard_timestamp();
+
+-- Function to update card_count in categories
+CREATE OR REPLACE FUNCTION update_card_count()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = 'INSERT' THEN
+        UPDATE categories 
+        SET card_count = card_count + 1 
+        WHERE cid = NEW.catid;
+    ELSIF TG_OP = 'DELETE' THEN
+        UPDATE categories 
+        SET card_count = card_count - 1 
+        WHERE cid = OLD.catid;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Triggers for card count
+CREATE TRIGGER trigger_increment_card_count
+AFTER INSERT ON flashcards
+FOR EACH ROW
+EXECUTE FUNCTION update_card_count();
+
+CREATE TRIGGER trigger_decrement_card_count
+AFTER DELETE ON flashcards
+FOR EACH ROW
+EXECUTE FUNCTION update_card_count();
 -- +goose StatementEnd
